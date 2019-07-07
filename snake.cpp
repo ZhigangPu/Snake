@@ -1,56 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <cstdlib>
-#include <string>
-#include <vector>
-#include <deque>
-#include <random>
-#include <chrono>
-#include <thread>
-
-using std::deque;
-using std::string;
-using std::vector;
-using std::cout;
-using std::cerr;
-using std::cin;
-using std::endl;
-using std::ifstream;
-
-typedef struct {
-    int x;
-    int y;
-} Point;
-
-typedef struct {
-    short dx;
-    short dy;
-} Velocity;
-
-typedef struct {
-    Velocity veclociy;
-    Point fruit; 
-    Point nextHead;
-    deque<Point> snake;
-    vector<string> world;
-    vector<string>::size_type worldHeight = world.size();
-    string::size_type worldWidth;
-    int eatenFruitNum = 0;
-} Game;
-
-typedef enum {
-    FRUIT,
-    WALL,
-    BODY,
-    SPACE
-} WorldTile;
-
-typedef enum {
-    ASH, // add snake head
-    CST, // cut snake tail
-    NFP  // new fuit postion
-} WorldOperation;
-
+#include "snake.h"
 
 void ReadCfg(Game& game) {
     string filename;
@@ -218,7 +166,7 @@ bool Initialize(Game& game){
     ReadCfg(game);
 }
 
-void RunGame(Game& game){
+void StartGame(Game& game){
     while(true)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -231,12 +179,9 @@ void RunGame(Game& game){
 
 }
 
-int main(int argc, char **argv){
-    cout << "Initializing game .." << endl;
+void RunGame() {
     Game game{};
     
     Initialize(game);    
     RunGame(game);
-
-    return 0;
 }
