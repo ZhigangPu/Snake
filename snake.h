@@ -7,6 +7,7 @@
 #include <random>
 #include <chrono>
 #include <thread>
+#include <ctime>
 
 using std::deque;
 using std::string;
@@ -33,7 +34,7 @@ typedef struct {
     Point nextHead;
     deque<Point> snake;
     vector<string> world;
-    vector<string>::size_type worldHeight = world.size();
+    vector<string>::size_type worldHeight;
     string::size_type worldWidth;
     int eatenFruitNum = 0;
 } Game;
@@ -80,4 +81,4 @@ bool GenerateNextAction(Game& game);
 
 bool Initialize(Game& game);
 
-void RunGame(Game& game);
+void RunGame();

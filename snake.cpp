@@ -14,6 +14,9 @@ void ReadCfg(Game& game) {
     infile >> game.veclociy.dx >> game.veclociy.dy;
     cout << "read in initial veclocity: (" << game.veclociy.dx << ", " << game.veclociy.dy << ")" << endl;
 
+    string dummy;
+    getline(infile, dummy);
+
     string oneLine;
     vector<string>::size_type lineNum{};
     while(getline(infile, oneLine)){
@@ -21,11 +24,11 @@ void ReadCfg(Game& game) {
         game.world.push_back(oneLine);
         if(oneLine.find("*") != string::npos){
             string::size_type snakePostion = oneLine.find("*");
-            game.snake.push_back(Point{lineNum, snakePostion});
+            game.snake.push_back(Point{lineNum, snakePostion+1});
         }
         if(oneLine.find("8") != string::npos){
             string::size_type fruitPostion = oneLine.find("8");
-            game.fruit = Point{lineNum, fruitPostion};
+            game.fruit = Point{lineNum, fruitPostion+1};
         }
 
     }
@@ -42,7 +45,7 @@ void PrintWorld(Game &game) {
 
 
 WorldTile WhatTile (Point& pt, vector<string>& world) {
-    char element = world[pt.x][pt.y];
+    char element = world[pt.x - 1][pt.y - 1];
     WorldTile tile;
     if (element == '#') tile = WALL;
     else if (element == '*') tile = BODY;
@@ -79,10 +82,11 @@ bool NextIsFruit(Game& game){
 }
 
 void GenerateNewFruit(Game& game){
+    game.worldHeight = game.world.size();
     game.worldWidth = game.world[0].size();
-    std::default_random_engine e;
-    std::uniform_int_distribution<unsigned> randomX(0, game.worldHeight);                   
-    std::uniform_int_distribution<unsigned> randomY(0, game.worldWidth);                   
+    std::default_random_engine e(time(0));
+    std::uniform_int_distribution<unsigned> randomX(1, game.worldHeight);                   
+    std::uniform_int_distribution<unsigned> randomY(1, game.worldWidth);                   
     while (true)
     {
         Point newFruit{randomX(e), randomY(e)};
@@ -102,20 +106,21 @@ void UpdateWorld(Game& game, WorldOperation op){
     case ASH:
     {
         deque<Point>::iterator iterSnakeBegin = game.snake.begin();
-        game.world[iterSnakeBegin->x][iterSnakeBegin->y] = '*';
+        game.world[iterSnakeBegin->x - 1][iterSnakeBegin->y - 1] = '*';
         break;
     }
     case CST:
     {
         deque<Point>::iterator iterSnakeEnd = game.snake.end();
         iterSnakeEnd--;
-        game.world[iterSnakeEnd->x][iterSnakeEnd->y] = ' ';
+        game.world[iterSnakeEnd->x - 1][iterSnakeEnd->y - 1] = ' ';
         break;
     }
     case NFP:
     {
-        game.world[game.fruit.x][game.fruit.y] = ' ';
+        game.world[game.fruit.x - 1][game.fruit.y - 1] = ' ';
         GenerateNewFruit(game);
+        game.world[game.fruit.x -1][game.fruit.y - 1] = '8';
         break;
     }
     default:
@@ -136,8 +141,8 @@ void PerformNextAction(Game& game){
     }
     else{
         game.snake.push_front(game.nextHead);
-        UpdateWorld(game, ASH);
         UpdateWorld(game, NFP);
+        UpdateWorld(game, ASH);
     }
     PrintWorld(game);
 }
@@ -183,5 +188,5 @@ void RunGame() {
     Game game{};
     
     Initialize(game);    
-    RunGame(game);
+    StartGame(game);
 }
